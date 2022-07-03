@@ -1,34 +1,56 @@
 #include "BTM.h"
 
-BTM::Message::Message() // empty constructor
+// empty constructor
+BTM::Message::Message()
 {
 }
-BTM::Message::Message(Vector<String> *_startSymbols, Vector<String> *_data) // full argument constructer
+// full argument constructer
+BTM::Message::Message(Vector<String> *_startSymbols, Vector<String> *_data)
 {
   mData = _data;
   mStartSymbols = _startSymbols;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BTM::BTM() // empty constructor
+
+// empty constructor
+BTM::BTM()
 {
 }
-BTM::BTM(HardwareSerial *_serial) // full argument constructor
+// full argument constructor
+BTM::BTM(HardwareSerial *_serial)
 {
   serial = _serial;
 }
 
-BTM::Message BTM::createMessage(Vector<String> *_startSymbols, Vector<String> *_data)
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// creating messages, and returning the id of the message
+byte BTM::createMessage(Vector<String> *_startSymbols, Vector<String> *_data)
 {
-  BTM::Message message(_startSymbols, _data);
-  return message;
+  if (messageList.empty()) // it sets once at the begining
+    messageList.setStorage(storage_arr);
+  BTM::Message message(_startSymbols, _data); // creating a new message
+  message.id = count;                         // setting its id
+  messageList.push_back(message);             // adding it to messageList
+  return count++;
 }
 
-void BTM::sendMessage(BTM::Message message)
+// setting the attributes of the active message
+void BTM::setMessageInfo(byte id)
 {
-  setMessageInfo(message);
-  String messageBuffer = "";
-  messageBuffer += START_CHAR;
+  if (id != prevID) // it wont set a message if its the same as the previous
+  {
+    prevID = id;
+    startSymbols = messageList[id].mStartSymbols;
+    data = messageList[id].mData;
+  }
+}
+// sending messages using its id
+void BTM::sendMessage(byte id)
+{
+  setMessageInfo(id); // setting the new message
+  String messageBuffer = (String)START_CHAR + "id=" + (String)id + (String)MID_CHAR;
   for (int i = 0; i < (*data).size(); i++)
   {
     char lastChar = (i != (*data).size() - 1) ? MID_CHAR : END_CHAR; // lastChar is always MID_CHAR except for the last data
@@ -37,20 +59,13 @@ void BTM::sendMessage(BTM::Message message)
   serial->println(messageBuffer);
 }
 
-void BTM::setMessageInfo(BTM::Message message)
+// receiving messages, and returning the id of the message or -1 if its incorrect message
+byte BTM::receiveMessage()
 {
-  if (&message != prevMessage) // it wont set it if its the same as the previous
-  {
-    prevMessage = &message;
-    startSymbols = message.mStartSymbols;
-    data = message.mData;
-  }
-}
-bool BTM::receiveMessage(BTM::Message message)
-{
-  setMessageInfo(message);
   char nextChar;
   String messageBuffer = "";
+  int i1;
+  int i2;
   if (serial->available())
   { // if receives any char
     do
@@ -62,25 +77,34 @@ bool BTM::receiveMessage(BTM::Message message)
       if (serial->available())
       {
         nextChar = serial->read();
-        messageBuffer += nextChar;
+        messageBuffer += (String)nextChar;
       }
-    } while (nextChar != END_CHAR); // read till the end of the message
-    if (messageBuffer.length() > 1) // if its not only END_CHAR
+    } while (nextChar != END_CHAR);                                    // read till the end of the message
+    if (messageBuffer.length() > 1 && messageBuffer.startsWith("id=")) // if its not only END_CHAR or didnt start with the id
     {
-      setMessageInfo(message);
-      messageBuffer = messageBuffer.substring(0, messageBuffer.length() - 1); // cutting the END_CHAR off
-      return readData(messageBuffer);
+      i1 = 3;
+      i2 = messageBuffer.indexOf(MID_CHAR).toInt();
+      byte id = (byte)(messageBuffer.substring(i1, i2));
+      if (id < messageList.size()) // if id is not out of range
+      {
+        i1 = messageBuffer.indexOf(MID_CHAR) + 1;
+        i2 = messageBuffer.length() - 1;
+        messageBuffer = messageBuffer.substring(i1, i2); // cutting the END_CHAR and the id part off
+        return readData(messageBuffer, id);
+      }
     }
   }
-  return false;
+  return -1;
 }
 
-bool BTM::readData(String text)
+// setting the data to their vector
+byte BTM::readData(String text, byte id)
 {
   int index1 = 0;
   int index2 = 0;
   int i = 0;
-  bool correct = true; // condition to keep track of all the data if they are set correctly or not
+  byte correctID = id; // for return statement
+  setMessageInfo(id);
   for (String elem : *startSymbols)
   {
     if (text.startsWith(elem))
@@ -92,9 +116,9 @@ bool BTM::readData(String text)
     }
     else
     {
-      correct = false;
+      correctID = -1; // incorrect message
     }
-    i++;
+    ++i;
   }
-  return correct;
+  return correctID;
 }
