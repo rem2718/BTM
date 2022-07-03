@@ -48,7 +48,9 @@ A simple library to handle sending/receiving messages using hardware Serial on A
 
 -Data arrays have to be unique for each message
 
--all data are string you can convert them to any type using(_.toInt()/.toFloat()/..._)
+-All data are string you can convert them to any type using(_.toInt()/.toFloat()/..._)
+
+-Dont forget to download [Vector.h](https://github.com/janelia-arduino/Vector) if you dont already have it.
 
 -You can check a simple **example** for receiving coordinates(x,y) and sending their signs in _simpleExample.ino_ file, and another one for receiveing two different messages in _twoMessagesExample.ino_ file.
 
