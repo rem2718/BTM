@@ -27,7 +27,7 @@ A simple library to handle sending/receiving messages using hardware Serial on A
   BTM btm(&Serial)
 ```
 
--The format for the messages is **?xy&xy;** x for start symbols, y for data (_to change the const characters check and modify BTM.h_)
+-The format for the messages is **?id=i&xy&xy;** i for id, x for start symbols and, y for data (_to change the const characters check and modify BTM.h_)
 
 -The symbols/data can be in any length
 
@@ -37,8 +37,12 @@ A simple library to handle sending/receiving messages using hardware Serial on A
 
 ```
   //Message constructor, Params: a Vector for start Symbols in your message, A vector for your data
-  Message message = btm.createMessage(&startSymbols1, &data);
+  byte message = btm.createMessage(&startSymbols1, &data);
 ```
+
+-The max number for messages is 10(_you might change it(MAX_SIZE) in BTM.h_)
+
+-The IDs of the messages depends on the order of messages creation(_first messge created: 0, second: 1 third: 2...and so on_)
 
 -Start symbols can be shared across messages(_they are read-only vectors_)
 
@@ -46,15 +50,15 @@ A simple library to handle sending/receiving messages using hardware Serial on A
 
 -all data are string you can convert them to any type using(_.toInt()/.toFloat()/..._)
 
--You can check a simple **example** for receiving coordinates(x,y) and sending their signs in _Example.ino_ file
+-You can check a simple **example** for receiving coordinates(x,y) and sending their signs in _simpleExample.ino_ file, and another one for receiveing two different messages in _twoMessagesExample.ino_ file.
 
 ## BTM Methods
 
-| Method             | Params                             | Return  | Description                                                                                          |
-| ------------------ | ---------------------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
-| **createMessage**  | Vector\<String\>, Vector\<String\> | Message | dont use message constructor, use this instead                                                       |
-| **receiveMessage** | Message                            | bool    | return correct if it recieve a full correct message using the start symbols given in the **message** |
-| **sendMessage**    | Message                            | void    | send the data in the correct format using the start symbols/data given in the **message**            |
+| Method             | Params                                                    | Return              | Description                                                                                                                   |
+| ------------------ | --------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **createMessage**  | start symbols (Vector\<String\>), data (Vector\<String\>) | message's id (byte) | dont use message constructor, use this instead                                                                                |
+| **receiveMessage** | none                                                      | message's id (byte) | return the message's id if it recieve a full correct message using the start symbols given in the **message** or -1 otherwise |
+| **sendMessage**    | message's id (byte)                                       | void                | send the data in the correct format using the start symbols/data given in the **message**                                     |
 
 ## THANK YOU!
 
