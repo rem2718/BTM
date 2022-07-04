@@ -83,8 +83,8 @@ byte BTM::receiveMessage()
     if (messageBuffer.length() > 1 && messageBuffer.startsWith("id=")) // if its not only END_CHAR or didnt start with the id
     {
       i1 = 3;
-      i2 = messageBuffer.indexOf(MID_CHAR).toInt();
-      byte id = (byte)(messageBuffer.substring(i1, i2));
+      i2 = messageBuffer.indexOf(MID_CHAR);
+      byte id = (byte)(messageBuffer.substring(i1, i2).toInt());
       if (id < messageList.size()) // if id is not out of range
       {
         i1 = messageBuffer.indexOf(MID_CHAR) + 1;
