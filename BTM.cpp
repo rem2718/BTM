@@ -18,7 +18,7 @@ BTM::BTM()
 {
 }
 // full argument constructor
-BTM::BTM(HardwareSerial *_serial)
+BTM::BTM(Stream *_serial)
 {
   serial = _serial;
 }
@@ -51,10 +51,10 @@ void BTM::sendMessage(byte id)
 {
   setMessageInfo(id); // setting the new message
   String messageBuffer = (String)START_CHAR + "id=" + (String)id + (String)MID_CHAR;
-  for (int i = 0; i < (*data).size(); i++)
+  for (int i = 0; i < (*data).max_size(); i++)
   {
-    char lastChar = (i != (*data).size() - 1) ? MID_CHAR : END_CHAR; // lastChar is always MID_CHAR except for the last data
-    messageBuffer += (*startSymbols)[i] + (*data)[i] + lastChar;
+    char lastChar = (i != (*data).max_size() - 1) ? MID_CHAR : END_CHAR; // lastChar is always MID_CHAR except for the last data
+    messageBuffer += ((*startSymbols)[i] + (*data)[i] + (String)lastChar);
   }
   serial->println(messageBuffer);
 }
@@ -80,6 +80,7 @@ byte BTM::receiveMessage()
         messageBuffer += (String)nextChar;
       }
     } while (nextChar != END_CHAR);                                    // read till the end of the message
+
     if (messageBuffer.length() > 1 && messageBuffer.startsWith("id=")) // if its not only END_CHAR or didnt start with the id
     {
       i1 = 3;
@@ -105,11 +106,11 @@ byte BTM::readData(String text, byte id)
   int i = 0;
   byte correctID = id; // for return statement
   setMessageInfo(id);
-  for (String elem : *startSymbols)
+  for (i = 0; i < (*startSymbols).max_size(); i++)
   {
-    if (text.startsWith(elem))
+    if (text.startsWith((*startSymbols)[i]))
     {
-      index1 = elem.length();
+      index1 = (*startSymbols)[i].length();
       index2 = (i != (*startSymbols).max_size() - 1) ? text.indexOf(MID_CHAR) : -1;
       (*data)[i] = (text.substring(index1, index2));
       text = text.substring(index2 + 1);
@@ -118,7 +119,6 @@ byte BTM::readData(String text, byte id)
     {
       correctID = -1; // incorrect message
     }
-    ++i;
   }
   return correctID;
 }

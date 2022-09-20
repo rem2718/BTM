@@ -1,9 +1,6 @@
 
-#include <BTM.h>
+#include "BTM.h"
 
-/*A simple example for receiving coordinates(x,y) and sending their signs(positive, negative)
-this sketch needs another bluetooth device to send/receive in the same format
-*/
 
 String sm[2] = {"x=", "y="}; // start symbols arr for the receiving message
 String data1[2];             // data arr for the receiving message
@@ -28,10 +25,12 @@ void setup()
 
 void loop()
 {
-  if (btm.receiveMessage(recMessage)) // if a correct message received
+
+  if (btm.receiveMessage() == recMessage) // if a correct message received
   {
     signs[0] = coordinates[0].toInt() >= 0 ? "positive" : "negative"; // you have to set the data before sending
     signs[1] = coordinates[1].toInt() >= 0 ? "positive" : "negative";
     btm.sendMessage(sendMessage); // sending the data
+
   }
 }

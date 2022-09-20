@@ -1,6 +1,6 @@
 # BLUETOOTH MODULE LIBRARY
 
-A simple library to handle sending/receiving messages using hardware Serial on Arduino
+A simple library to handle sending/receiving messages using hardware/software Serial on Arduino
 
 ## INSTALL THE LIBRARY
 
@@ -48,9 +48,7 @@ A simple library to handle sending/receiving messages using hardware Serial on A
 
 -Data arrays have to be unique for each message
 
--All data are string you can convert them to any type using(_.toInt()/.toFloat()/..._)
-
--Dont forget to download [Vector.h](https://github.com/janelia-arduino/Vector) if you dont already have it.
+-all data are string you can convert them to any type using(_.toInt()/.toFloat()/..._)
 
 -You can check a simple **example** for receiving coordinates(x,y) and sending their signs in _simpleExample.ino_ file, and another one for receiveing two different messages in _twoMessagesExample.ino_ file.
 
