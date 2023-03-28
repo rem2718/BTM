@@ -15,38 +15,39 @@
   -all data are string you can convert them to any type using(.toInt()/.toFloat()/...)
 
 */
+// line 1
 class BTM
 {
-  public:
-    BTM();                                                                    // empty constructor
-    BTM(Stream *_serial);                                             // full argument constructor
-    byte createMessage(Vector<String> *_startSymbols, Vector<String> *_data); // creating messages, and returning the id of the message
-    void sendMessage(byte id);                                                // sending messages using its id
-    byte receiveMessage();                                                    // receiving messages, and returning the id of the message or -1 if its incorrect message
+public:
+  BTM();                                                                    // empty constructor
+  BTM(Stream *_serial);                                                     // full argument constructor
+  byte createMessage(Vector<String> *_startSymbols, Vector<String> *_data); // creating messages, and returning the id of the message
+  void sendMessage(byte id);                                                // sending messages using its id
+  byte receiveMessage();                                                    // receiving messages, and returning the id of the message or -1 if its incorrect message
 
-  private:
-    class Message
-    {
-      public:
-        Message();                                                     // empty constructor
-        Message(Vector<String> *_startSymbols, Vector<String> *_data); // full argument constructor
-        byte id;                                                       // id for the message
-        Vector<String> *mStartSymbols;                                 // vector for the start symbols for each data
-        Vector<String> *mData;                                         // the data for the message
-    };
-    byte readData(String text, byte id); // setting the data to their vector
-    void setMessageInfo(byte id);        // setting the vectsors for the active message
-    Stream *serial;
-    const char START_CHAR = '?';
-    const char END_CHAR = ';';
-    const char MID_CHAR = '&';
-    const static byte MAX_SIZE = 10;
-    Message storage_arr[MAX_SIZE]; // storage array for messageList
-    Vector<Message> messageList;   // list to hold all the messages
-    byte prevID = -1;              // var to check whether the message changed or not
-    byte count;
-    Vector<String> *startSymbols;
-    Vector<String> *data;
+private:
+  class Message
+  {
+  public:
+    Message();                                                     // empty constructor
+    Message(Vector<String> *_startSymbols, Vector<String> *_data); // full argument constructor
+    byte id;                                                       // id for the message
+    Vector<String> *mStartSymbols;                                 // vector for the start symbols for each data
+    Vector<String> *mData;                                         // the data for the message
+  };
+  byte readData(String text, byte id); // setting the data to their vector
+  void setMessageInfo(byte id);        // setting the vectsors for the active message
+  Stream *serial;
+  const char START_CHAR = '?';
+  const char END_CHAR = ';';
+  const char MID_CHAR = '&';
+  const static byte MAX_SIZE = 10;
+  Message storage_arr[MAX_SIZE]; // storage array for messageList
+  Vector<Message> messageList;   // list to hold all the messages
+  byte prevID = -1;              // var to check whether the message changed or not
+  byte count;
+  Vector<String> *startSymbols;
+  Vector<String> *data;
 };
 
 #endif
